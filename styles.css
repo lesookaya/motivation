@@ -1,185 +1,238 @@
 :root {
-    --bg: #f5f7fb;
-    --card: #ffffff;
-    --accent: #4f46e5;
-    --accent-hover: #4338ca;
-    --success: #10b981;
-    --danger: #ef4444;
-    --text: #111827;
-    --muted: #6b7280;
-    --border: #e5e7eb;
+  --bg: #f4f7f6;
+  --panel: #ffffff;
+  --text: #1f2933;
+  --muted: #64748b;
+  --line: #d9e2ec;
+  --accent: #0f766e;
+  --accent-dark: #115e59;
+  --danger: #b42318;
+  --shadow: 0 18px 45px rgba(31, 41, 51, 0.08);
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: Inter, Segoe UI, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 30px;
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background: var(--bg);
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
+.page {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.page-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+h1,
+h2 {
+  margin: 0;
+  line-height: 1.2;
 }
 
 h1 {
-    margin-bottom: 25px;
-    font-size: 32px;
+  font-size: clamp(32px, 5vw, 52px);
 }
 
 h2 {
-    margin-bottom: 20px;
+  font-size: 22px;
 }
 
-.card {
-    background: var(--card);
-    border-radius: 18px;
-    padding: 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+.sales-plan {
+  display: grid;
+  gap: 8px;
+  width: min(360px, 100%);
+  font-weight: 700;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
-    gap: 20px;
+.sales-plan input,
+td input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 11px;
+  font: inherit;
+  color: var(--text);
+  background: #fff;
 }
 
-label {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--muted);
-    font-size: 14px;
+.sales-plan input:focus,
+td input:focus {
+  outline: 2px solid rgba(15, 118, 110, 0.2);
+  border-color: var(--accent);
 }
 
-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    font-size: 15px;
-    transition: .2s;
+.tables-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 24px;
+  align-items: start;
 }
 
-input:focus {
-    outline: none;
-    border-color: var(--accent);
+.table-block {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.table-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 68px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.wide-table-wrap {
+  max-height: 640px;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th {
-    background: #f9fafb;
-    font-weight: 600;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 th,
 td {
-    padding: 12px;
-    border-bottom: 1px solid var(--border);
-    text-align: center;
+  border-bottom: 1px solid var(--line);
+  padding: 12px;
+  text-align: left;
+  vertical-align: middle;
 }
 
-button {
-    border: none;
-    cursor: pointer;
-    border-radius: 10px;
-    transition: .2s;
+th {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  background: #f8faf9;
 }
 
-.add-btn {
-    background: var(--accent);
-    color: white;
-    padding: 12px 18px;
+td:first-child {
+  font-weight: 600;
 }
 
-.add-btn:hover {
-    background: var(--accent-hover);
+tr:last-child td {
+  border-bottom: 0;
 }
 
-.delete-btn {
-    background: var(--danger);
-    color: white;
-    width: 36px;
-    height: 36px;
+.conversion,
+#calculationTable td {
+  color: var(--accent-dark);
+  font-weight: 700;
 }
 
-.delete-btn:hover {
-    opacity: .9;
+.conversion {
+  min-width: 155px;
 }
 
-.result {
+.action-column {
+  width: 52px;
+}
+
+.secondary-button,
+.icon-button {
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.secondary-button {
+  min-height: 38px;
+  padding: 8px 12px;
+  color: #fff;
+  background: var(--accent);
+  font-weight: 700;
+}
+
+.secondary-button:hover {
+  background: var(--accent-dark);
+}
+
+.icon-button {
+  width: 34px;
+  height: 34px;
+  color: var(--danger);
+  background: #fff1f0;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.icon-button:hover {
+  background: #ffe0dc;
+}
+
+.bonus-block,
+.calculation-block {
+  margin-top: 24px;
+}
+
+.bonus-block table {
+  table-layout: fixed;
+}
+
+#calculationTable {
+  min-width: 1260px;
+  table-layout: fixed;
+}
+
+#calculationTable th,
+#calculationTable td {
+  min-width: 120px;
+}
+
+#calculationTable th:nth-child(10),
+#calculationTable td:nth-child(10) {
+  min-width: 165px;
+}
+
+@media (max-width: 900px) {
+  .page-header,
+  .tables-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
     display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
-    gap: 16px;
+    align-items: start;
+  }
 }
 
-.metric {
-    padding: 20px;
-    background: #f8fafc;
-    border-radius: 14px;
-}
+@media (max-width: 560px) {
+  .page {
+    width: min(100% - 20px, 1180px);
+    padding: 24px 0;
+  }
 
-.metric-title {
-    color: var(--muted);
-    font-size: 14px;
-}
+  .table-title-row {
+    align-items: start;
+    flex-direction: column;
+  }
 
-.metric-value {
-    font-size: 30px;
-    font-weight: 700;
-    margin-top: 10px;
-}
-
-.footer {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.save-btn {
-    background: var(--success);
-    color: white;
-    padding: 12px 20px;
-}
-
-.reset-btn {
-    background: #64748b;
-    color: white;
-    padding: 12px 20px;
-}
-
-.save-btn:hover,
-.reset-btn:hover {
-    opacity: .9;
-}
-
-.warning {
-    color: #d97706;
-    margin-top: 10px;
-}
-
-@media (max-width: 768px) {
-
-    body {
-        padding: 15px;
-    }
-
-    table {
-        display: block;
-        overflow-x: auto;
-    }
-
-    .metric-value {
-        font-size: 24px;
-    }
+  th,
+  td {
+    padding: 10px;
+  }
 }

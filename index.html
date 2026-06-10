@@ -1,383 +1,303 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Калькулятор мотивации</title>
-
-<style>
-:root{
-    --bg:#f5f7fb;
-    --card:#ffffff;
-    --accent:#4f46e5;
-    --text:#1f2937;
-    --border:#e5e7eb;
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Inter,Segoe UI,sans-serif;
-}
-
-body{
-    background:var(--bg);
-    padding:30px;
-    color:var(--text);
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-}
-
-h1{
-    margin-bottom:24px;
-}
-
-.card{
-    background:var(--card);
-    border-radius:16px;
-    padding:24px;
-    margin-bottom:20px;
-    box-shadow:0 4px 20px rgba(0,0,0,.05);
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:16px;
-}
-
-label{
-    display:block;
-    font-size:14px;
-    margin-bottom:6px;
-    color:#6b7280;
-}
-
-input{
-    width:100%;
-    padding:10px;
-    border:1px solid var(--border);
-    border-radius:10px;
-    font-size:15px;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th,td{
-    padding:12px;
-    border-bottom:1px solid var(--border);
-    text-align:center;
-}
-
-th{
-    background:#fafafa;
-}
-
-button{
-    cursor:pointer;
-    border:none;
-    border-radius:10px;
-    padding:10px 16px;
-    font-size:14px;
-}
-
-.add-btn{
-    background:var(--accent);
-    color:white;
-}
-
-.delete-btn{
-    background:#ef4444;
-    color:white;
-}
-
-.result{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:16px;
-}
-
-.metric{
-    background:#f8fafc;
-    border-radius:12px;
-    padding:20px;
-}
-
-.metric-title{
-    font-size:13px;
-    color:#6b7280;
-}
-
-.metric-value{
-    font-size:28px;
-    font-weight:700;
-    margin-top:8px;
-}
-
-.footer{
-    margin-top:15px;
-    display:flex;
-    gap:10px;
-}
-
-.save-btn{
-    background:#10b981;
-    color:white;
-}
-
-.reset-btn{
-    background:#64748b;
-    color:white;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Расчет премии</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
+  <main class="page">
+    <section class="page-header">
+      <h1>Расчет премии</h1>
+      <label class="sales-plan">
+        <span>План продаж</span>
+        <input id="salesPlan" type="number" min="0" step="1000" placeholder="Введите сумму">
+      </label>
+    </section>
 
-<div class="container">
-
-<h1>💰 Калькулятор мотивации</h1>
-
-<div class="card">
-    <div class="grid">
-        <div>
-            <label>Оклад (₽)</label>
-            <input type="number" id="salary" value="120000">
+    <section class="tables-grid">
+      <div class="table-block">
+        <div class="table-title-row">
+          <h2>Нормы</h2>
         </div>
-
-        <div>
-            <label>Максимальная KPI-премия (₽)</label>
-            <input type="number" id="maxBonus" value="50000">
+        <div class="table-wrap">
+          <table id="normsTable">
+            <tbody>
+              <tr>
+                <td>Количество рабочих дней в месяц</td>
+                <td><input type="number" min="0" step="1"></td>
+              </tr>
+              <tr>
+                <td>Новых заявок в день</td>
+                <td><input id="newRequestsPerDay" type="number" min="0" step="1"></td>
+              </tr>
+              <tr>
+                <td>Обработанные новые заявки в месяц</td>
+                <td><input type="number" min="0" step="1"></td>
+              </tr>
+              <tr>
+                <td>Состоявшихся встреч с клиентами в месяц</td>
+                <td><input type="number" min="0" step="1"></td>
+              </tr>
+              <tr>
+                <td>Средний чек</td>
+                <td><input id="averageCheck" type="number" min="0" step="1000"></td>
+              </tr>
+              <tr>
+                <td>План состоявшихся сделок в месяц</td>
+                <td><input type="number" min="0" step="1"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </div>
-</div>
+      </div>
 
-<div class="card">
+      <div class="table-block">
+        <div class="table-title-row">
+          <h2>Воронка</h2>
+          <button class="secondary-button" type="button" id="addFunnelRow">+ строка</button>
+        </div>
+        <div class="table-wrap">
+          <table id="funnelTable">
+            <thead>
+              <tr>
+                <th>Стадии</th>
+                <th>Воронка</th>
+                <th>Конверсия из этапа в этап</th>
+                <th class="action-column"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" value="Лид взят в работу"></td>
+                <td><input class="funnel-value" type="number" min="0" step="1"></td>
+                <td class="conversion">-</td>
+                <td><button class="icon-button remove-row" type="button" aria-label="Удалить строку">x</button></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="Лид ответил"></td>
+                <td><input class="funnel-value" type="number" min="0" step="1"></td>
+                <td class="conversion">-</td>
+                <td><button class="icon-button remove-row" type="button" aria-label="Удалить строку">x</button></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="Лид квалифицирован"></td>
+                <td><input class="funnel-value" type="number" min="0" step="1"></td>
+                <td class="conversion">-</td>
+                <td><button class="icon-button remove-row" type="button" aria-label="Удалить строку">x</button></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="Встреча назначена"></td>
+                <td><input class="funnel-value" type="number" min="0" step="1"></td>
+                <td class="conversion">-</td>
+                <td><button class="icon-button remove-row" type="button" aria-label="Удалить строку">x</button></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="Встреча состоялась"></td>
+                <td><input class="funnel-value" type="number" min="0" step="1"></td>
+                <td class="conversion">-</td>
+                <td><button class="icon-button remove-row" type="button" aria-label="Удалить строку">x</button></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="Состоявшихся сделок"></td>
+                <td><input class="funnel-value" type="number" min="0" step="1"></td>
+                <td class="conversion">-</td>
+                <td><button class="icon-button remove-row" type="button" aria-label="Удалить строку">x</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-<h2 style="margin-bottom:15px;">Воронка KPI</h2>
+    <section class="table-block bonus-block">
+      <div class="table-title-row">
+        <h2>% премии от выполнения плана</h2>
+      </div>
+      <div class="table-wrap">
+        <table id="bonusTable">
+          <thead>
+            <tr>
+              <th>От</th>
+              <th>До</th>
+              <th>% премии</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" value="0%"></td>
+              <td><input type="text" value="19%"></td>
+              <td><input type="text" value="1%"></td>
+            </tr>
+            <tr>
+              <td><input type="text" value="20%"></td>
+              <td><input type="text" value="49%"></td>
+              <td><input type="text" value="2%"></td>
+            </tr>
+            <tr>
+              <td><input type="text" value="50%"></td>
+              <td><input type="text" value="99%"></td>
+              <td><input type="text" value="3%"></td>
+            </tr>
+            <tr>
+              <td><input type="text" value="100%"></td>
+              <td><input type="text" value="и выше"></td>
+              <td><input type="text" value="4%"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-<table id="kpiTable">
-<thead>
-<tr>
-<th>Этап</th>
-<th>План</th>
-<th>Факт</th>
-<th>Вес (%)</th>
-<th>Выполнение</th>
-<th></th>
-</tr>
-</thead>
+    <section class="table-block calculation-block">
+      <div class="table-title-row">
+        <h2>Расчет премии</h2>
+        <button class="secondary-button" type="button" id="addCalculationRow">+ строка</button>
+      </div>
+      <div class="table-wrap wide-table-wrap">
+        <table id="calculationTable">
+          <thead>
+            <tr>
+              <th>Лид взят в работу</th>
+              <th>Лид ответил</th>
+              <th>Лид квалифицирован</th>
+              <th>Встреча назначена</th>
+              <th>Встреча состоялась</th>
+              <th>Состоявшихся сделок</th>
+              <th>Сумма продаж</th>
+              <th>% от плана выручки</th>
+              <th>% менеджера</th>
+              <th>Сумма премии менеджера</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+            <tr>
+              <td data-field="leads"></td>
+              <td data-field="answered"></td>
+              <td data-field="qualified"></td>
+              <td data-field="meetingSet"></td>
+              <td data-field="meetingDone"></td>
+              <td data-field="deals"></td>
+              <td data-field="sales"></td>
+              <td data-field="planPercent"></td>
+              <td data-field="managerPercent"></td>
+              <td data-field="premium"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
-<tbody>
-<tr>
-<td><input value="Лиды"></td>
-<td><input type="number" value="100"></td>
-<td><input type="number" value="120"></td>
-<td><input type="number" value="20"></td>
-<td class="achievement">120%</td>
-<td><button class="delete-btn" onclick="deleteRow(this)">✕</button></td>
-</tr>
-
-<tr>
-<td><input value="Созвоны"></td>
-<td><input type="number" value="50"></td>
-<td><input type="number" value="40"></td>
-<td><input type="number" value="20"></td>
-<td class="achievement">80%</td>
-<td><button class="delete-btn" onclick="deleteRow(this)">✕</button></td>
-</tr>
-
-<tr>
-<td><input value="КП"></td>
-<td><input type="number" value="20"></td>
-<td><input type="number" value="18"></td>
-<td><input type="number" value="20"></td>
-<td class="achievement">90%</td>
-<td><button class="delete-btn" onclick="deleteRow(this)">✕</button></td>
-</tr>
-
-<tr>
-<td><input value="Продажи"></td>
-<td><input type="number" value="10"></td>
-<td><input type="number" value="8"></td>
-<td><input type="number" value="40"></td>
-<td class="achievement">80%</td>
-<td><button class="delete-btn" onclick="deleteRow(this)">✕</button></td>
-</tr>
-
-</tbody>
-</table>
-
-<div style="margin-top:15px;">
-<button class="add-btn" onclick="addRow()">+ Добавить этап</button>
-</div>
-
-</div>
-
-<div class="card">
-
-<h2 style="margin-bottom:15px;">Результат</h2>
-
-<div class="result">
-
-<div class="metric">
-<div class="metric-title">Итоговый KPI</div>
-<div class="metric-value" id="kpiResult">0%</div>
-</div>
-
-<div class="metric">
-<div class="metric-title">Премия</div>
-<div class="metric-value" id="bonusResult">0 ₽</div>
-</div>
-
-<div class="metric">
-<div class="metric-title">Итоговая ЗП</div>
-<div class="metric-value" id="salaryResult">0 ₽</div>
-</div>
-
-</div>
-
-<div class="footer">
-<button class="save-btn" onclick="saveSettings()">Сохранить</button>
-<button class="reset-btn" onclick="resetSettings()">Сбросить</button>
-</div>
-
-</div>
-
-</div>
-
-<script>
-
-function formatMoney(value){
-    return Number(value).toLocaleString('ru-RU') + ' ₽';
-}
-
-function calculate(){
-
-    let rows = document.querySelectorAll("#kpiTable tbody tr");
-
-    let totalWeight = 0;
-    let weightedResult = 0;
-
-    rows.forEach(row=>{
-
-        let plan = Number(row.cells[1].querySelector("input").value) || 0;
-        let fact = Number(row.cells[2].querySelector("input").value) || 0;
-        let weight = Number(row.cells[3].querySelector("input").value) || 0;
-
-        let percent = plan > 0
-            ? (fact / plan) * 100
-            : 0;
-
-        row.querySelector(".achievement").innerText =
-            percent.toFixed(0) + "%";
-
-        weightedResult += percent * weight;
-        totalWeight += weight;
-    });
-
-    let finalKPI = totalWeight > 0
-        ? weightedResult / totalWeight
-        : 0;
-
-    if(finalKPI > 120){
-        finalKPI = 120;
-    }
-
-    let salary =
-        Number(document.getElementById("salary").value) || 0;
-
-    let maxBonus =
-        Number(document.getElementById("maxBonus").value) || 0;
-
-    let bonus =
-        maxBonus * (finalKPI / 100);
-
-    let totalSalary =
-        salary + bonus;
-
-    document.getElementById("kpiResult").innerText =
-        finalKPI.toFixed(1) + "%";
-
-    document.getElementById("bonusResult").innerText =
-        formatMoney(Math.round(bonus));
-
-    document.getElementById("salaryResult").innerText =
-        formatMoney(Math.round(totalSalary));
-}
-
-function addRow(){
-
-    const tbody =
-        document.querySelector("#kpiTable tbody");
-
-    const row =
-        document.createElement("tr");
-
-    row.innerHTML = `
-        <td><input value="Новый этап"></td>
-        <td><input type="number" value="100"></td>
-        <td><input type="number" value="0"></td>
-        <td><input type="number" value="10"></td>
-        <td class="achievement">0%</td>
-        <td>
-            <button class="delete-btn"
-            onclick="deleteRow(this)">✕</button>
-        </td>
-    `;
-
-    tbody.appendChild(row);
-
-    attachListeners();
-    calculate();
-}
-
-function deleteRow(btn){
-    btn.closest("tr").remove();
-    calculate();
-}
-
-function attachListeners(){
-    document
-        .querySelectorAll("input")
-        .forEach(input=>{
-            input.removeEventListener("input",calculate);
-            input.addEventListener("input",calculate);
-        });
-}
-
-function saveSettings(){
-
-    localStorage.setItem(
-        "motivationCalculator",
-        document.body.innerHTML
-    );
-
-    alert("Настройки сохранены");
-}
-
-function resetSettings(){
-
-    localStorage.removeItem(
-        "motivationCalculator"
-    );
-
-    location.reload();
-}
-
-attachListeners();
-calculate();
-
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
-<script src="script.js"></script>
-</body>

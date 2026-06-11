@@ -1,14 +1,24 @@
 const salesPlanInput = document.querySelector("#salesPlan");
+const workDaysInput = document.querySelector("#workDays");
 const newRequestsPerDayInput = document.querySelector("#newRequestsPerDay");
+const processedRequestsInput = document.querySelector("#processedRequests");
+const monthlyMeetingsInput = document.querySelector("#monthlyMeetings");
 const averageCheckInput = document.querySelector("#averageCheck");
 const funnelTable = document.querySelector("#funnelTable");
 const bonusTable = document.querySelector("#bonusTable");
 const calculationTable = document.querySelector("#calculationTable");
 const addFunnelRowButton = document.querySelector("#addFunnelRow");
 const addCalculationRowButton = document.querySelector("#addCalculationRow");
+const saveDataButton = document.querySelector("#saveData");
+const saveStatus = document.querySelector("#saveStatus");
+const STORAGE_KEY = "premiumCalculatorData";
 
 function toNumber(value) {
-  const normalizedValue = String(value).replace(",", ".").replace("%", "").trim();
+  const normalizedValue = String(value)
+    .replace(/\s/g, "")
+    .replace(",", ".")
+    .replace("%", "")
+    .trim();
   const number = Number(normalizedValue);
 
   return Number.isFinite(number) ? number : 0;
@@ -30,6 +40,18 @@ function formatPercent(value) {
   return `${Math.round(value)}%`;
 }
 
+function formatInputMoney(value) {
+  const number = toNumber(value);
+
+  return number ? Math.round(number).toLocaleString("ru-RU") : "";
+}
+
+function formatMoneyInputs() {
+  document.querySelectorAll(".money-input").forEach((input) => {
+    input.value = formatInputMoney(input.value);
+  });
+}
+
 function parsePercent(value) {
   return toNumber(value);
 }
@@ -38,6 +60,10 @@ function getFunnelConversionPercent(index) {
   const conversionCells = Array.from(funnelTable.querySelectorAll(".conversion"));
 
   return parsePercent(conversionCells[index]?.textContent || "0");
+}
+
+function getFunnelConversion(index) {
+  return getFunnelConversionPercent(index) / 100;
 }
 
 function getBonusRanges() {
@@ -77,6 +103,26 @@ function updateFunnelConversions() {
   });
 }
 
+function calculateThroughFunnel(startValue, lastConversionIndex) {
+  let result = Math.round(startValue);
+
+  for (let index = 1; index <= lastConversionIndex; index += 1) {
+    result = Math.round(result * getFunnelConversion(index));
+  }
+
+  return result;
+}
+
+function updateNorms() {
+  const workDays = Number(workDaysInput.value) || 0;
+  const newRequestsPerDay = Number(newRequestsPerDayInput.value) || 0;
+  const processedRequests = Math.round(workDays * newRequestsPerDay);
+  const monthlyMeetings = calculateThroughFunnel(processedRequests, 4);
+
+  processedRequestsInput.value = formatNumber(processedRequests);
+  monthlyMeetingsInput.value = formatNumber(monthlyMeetings);
+}
+
 function createCalculationRow() {
   const row = document.createElement("tr");
 
@@ -96,25 +142,42 @@ function createCalculationRow() {
   return row;
 }
 
+function createFunnelRow(stage = "Новая стадия", value = "") {
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td><input type="text"></td>
+    <td><input class="funnel-value" type="number" min="0" step="1"></td>
+    <td class="conversion">-</td>
+    <td><button class="icon-button remove-row" type="button" aria-label="Удалить строку">x</button></td>
+  `;
+
+  const inputs = row.querySelectorAll("input");
+  inputs[0].value = stage;
+  inputs[1].value = value;
+
+  return row;
+}
+
 function updateCalculationTable() {
   const rows = Array.from(calculationTable.querySelectorAll("tbody tr"));
   const newRequestsPerDay = Number(newRequestsPerDayInput.value) || 0;
-  const averageCheck = Number(averageCheckInput.value) || 0;
-  const salesPlan = Number(salesPlanInput.value) || 0;
+  const averageCheck = toNumber(averageCheckInput.value);
+  const salesPlan = toNumber(salesPlanInput.value);
 
-  const answeredConversion = getFunnelConversionPercent(1) / 100;
-  const qualifiedConversion = getFunnelConversionPercent(2) / 100;
-  const meetingSetConversion = getFunnelConversionPercent(3) / 100;
-  const meetingDoneConversion = getFunnelConversionPercent(4) / 100;
-  const dealsConversion = getFunnelConversionPercent(5) / 100;
+  const answeredConversion = getFunnelConversion(1);
+  const qualifiedConversion = getFunnelConversion(2);
+  const meetingSetConversion = getFunnelConversion(3);
+  const meetingDoneConversion = getFunnelConversion(4);
+  const dealsConversion = getFunnelConversion(5);
 
   rows.forEach((row, index) => {
-    const leads = newRequestsPerDay * (index + 1);
-    const answered = leads * answeredConversion;
-    const qualified = answered * qualifiedConversion;
-    const meetingSet = qualified * meetingSetConversion;
-    const meetingDone = meetingSet * meetingDoneConversion;
-    const deals = meetingDone * dealsConversion;
+    const leads = Math.round(newRequestsPerDay * (index + 1));
+    const answered = Math.round(leads * answeredConversion);
+    const qualified = Math.round(answered * qualifiedConversion);
+    const meetingSet = Math.round(qualified * meetingSetConversion);
+    const meetingDone = Math.round(meetingSet * meetingDoneConversion);
+    const deals = Math.round(meetingDone * dealsConversion);
     const sales = deals * averageCheck;
     const planPercent = salesPlan > 0 ? (sales / salesPlan) * 100 : 0;
     const managerPercent = getManagerPercent(planPercent);
@@ -135,21 +198,14 @@ function updateCalculationTable() {
 
 function updateAllCalculations() {
   updateFunnelConversions();
+  updateNorms();
   updateCalculationTable();
 }
 
 function addFunnelRow() {
   const tbody = funnelTable.querySelector("tbody");
-  const row = document.createElement("tr");
 
-  row.innerHTML = `
-    <td><input type="text" value="Новая стадия"></td>
-    <td><input class="funnel-value" type="number" min="0" step="1"></td>
-    <td class="conversion">-</td>
-    <td><button class="icon-button remove-row" type="button" aria-label="Удалить строку">x</button></td>
-  `;
-
-  tbody.append(row);
+  tbody.append(createFunnelRow());
   updateAllCalculations();
 }
 
@@ -169,7 +225,78 @@ function addCalculationRow() {
   updateCalculationTable();
 }
 
-document.addEventListener("input", updateAllCalculations);
+function saveData() {
+  const data = {
+    inputs: Array.from(document.querySelectorAll("input")).map((input) => input.value),
+    funnelRows: Array.from(funnelTable.querySelectorAll("tbody tr")).map((row) => {
+      const inputs = row.querySelectorAll("input");
+
+      return {
+        stage: inputs[0]?.value || "",
+        value: inputs[1]?.value || "",
+      };
+    }),
+    calculationRowCount: calculationTable.querySelectorAll("tbody tr").length,
+  };
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  saveStatus.textContent = "Сохранено";
+  window.setTimeout(() => {
+    saveStatus.textContent = "";
+  }, 2000);
+}
+
+function restoreData() {
+  const savedData = localStorage.getItem(STORAGE_KEY);
+
+  if (!savedData) {
+    return;
+  }
+
+  let data;
+
+  try {
+    data = JSON.parse(savedData);
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    return;
+  }
+
+  const funnelBody = funnelTable.querySelector("tbody");
+  const calculationBody = calculationTable.querySelector("tbody");
+
+  if (Array.isArray(data.funnelRows) && data.funnelRows.length) {
+    funnelBody.innerHTML = "";
+
+    data.funnelRows.forEach((item) => {
+      funnelBody.append(createFunnelRow(item.stage, item.value));
+    });
+  }
+
+  if (data.calculationRowCount) {
+    calculationBody.innerHTML = "";
+
+    for (let index = 0; index < data.calculationRowCount; index += 1) {
+      calculationBody.append(createCalculationRow());
+    }
+  }
+
+  if (Array.isArray(data.inputs)) {
+    document.querySelectorAll("input").forEach((input, index) => {
+      if (!input.readOnly && data.inputs[index] !== undefined) {
+        input.value = data.inputs[index];
+      }
+    });
+  }
+}
+
+document.addEventListener("input", (event) => {
+  if (event.target.classList.contains("money-input")) {
+    event.target.value = formatInputMoney(event.target.value);
+  }
+
+  updateAllCalculations();
+});
 
 funnelTable.addEventListener("click", (event) => {
   if (event.target.classList.contains("remove-row")) {
@@ -179,4 +306,7 @@ funnelTable.addEventListener("click", (event) => {
 
 addFunnelRowButton.addEventListener("click", addFunnelRow);
 addCalculationRowButton.addEventListener("click", addCalculationRow);
+saveDataButton.addEventListener("click", saveData);
+restoreData();
+formatMoneyInputs();
 updateAllCalculations();

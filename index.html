@@ -12,7 +12,7 @@
       <h1>Расчет премии</h1>
       <label class="sales-plan">
         <span>План продаж</span>
-        <input id="salesPlan" type="number" min="0" step="1000" placeholder="Введите сумму">
+        <input id="salesPlan" class="money-input" type="text" inputmode="numeric" placeholder="Введите сумму">
       </label>
     </section>
 
@@ -26,7 +26,7 @@
             <tbody>
               <tr>
                 <td>Количество рабочих дней в месяц</td>
-                <td><input type="number" min="0" step="1"></td>
+                <td><input id="workDays" type="number" min="0" step="1"></td>
               </tr>
               <tr>
                 <td>Новых заявок в день</td>
@@ -34,15 +34,15 @@
               </tr>
               <tr>
                 <td>Обработанные новые заявки в месяц</td>
-                <td><input type="number" min="0" step="1"></td>
+                <td><input id="processedRequests" class="calculated-input" type="text" readonly></td>
               </tr>
               <tr>
                 <td>Состоявшихся встреч с клиентами в месяц</td>
-                <td><input type="number" min="0" step="1"></td>
+                <td><input id="monthlyMeetings" class="calculated-input" type="text" readonly></td>
               </tr>
               <tr>
                 <td>Средний чек</td>
-                <td><input id="averageCheck" type="number" min="0" step="1000"></td>
+                <td><input id="averageCheck" class="money-input" type="text" inputmode="numeric"></td>
               </tr>
               <tr>
                 <td>План состоявшихся сделок в месяц</td>
@@ -295,6 +295,11 @@
           </tbody>
         </table>
       </div>
+    </section>
+
+    <section class="save-section">
+      <button class="save-button" type="button" id="saveData">Сохранить</button>
+      <span class="save-status" id="saveStatus" aria-live="polite"></span>
     </section>
   </main>
 
